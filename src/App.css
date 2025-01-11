@@ -1,0 +1,30 @@
+* {
+    background-color: #151522;
+}
+main {
+    display: flex;
+    background-color: #2a2a3d;
+    border-radius: 10px;
+}
+
+main > * {
+    flex: 1; /* Makes each child take equal space */
+    padding: 5px; /* Optional: Add padding for better aesthetics */
+}
+
+.timeMemoryInfo {
+    color: #d4d4d4;
+    font-size: 12px;
+    font-style: italic;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 10px 0;
+  }
+
+  .footer {
+    color: #d4d4d4;
+    font-size: 12px;
+    font-style: italic;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 10px 0;
+  }
+  
