@@ -8,7 +8,7 @@ interface InputProps {
 
 const Input = ({ setInput }: InputProps) => {
   return (
-    <Card className="w-full mx-auto p-4 grid grid-rows-6">
+    <Card className="w-full mx-auto p-4 grid grid-rows-6 h-full">
       <h2 className="text-2xl font-bold row-span-1">Input</h2>
       <div className="flex justify-between items-center row-span-5 border border-foreground rounded">
         <textarea

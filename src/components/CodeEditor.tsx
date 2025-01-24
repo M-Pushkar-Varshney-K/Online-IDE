@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Play, Share, Save, Braces } from "lucide-react";
 import { executeCode } from "@/api";
-import { CODE_SNIPPETS } from "@/constants";
+import { CODE_SNIPPETS, LANGUAGE_EXTENSIONS } from "@/constants";
 import { saveAs } from "file-saver";
 
 interface CodeEditorProps {
@@ -41,33 +41,36 @@ const CodeEditor = ({
       setLoad(true);
       const { run: result } = await executeCode(input, language, sourceCode);
       setOutput(result.output.split("\n"));
-      console.log("Code " + result);
       result.stderr ? setError(true) : setError(false);
     } catch (error) {
       console.error("Error:", error);
+      if (error instanceof Error) {
+        setOutput(["Error:", error.message]);
+      } else {
+        setOutput(["An unknown error occurred"]);
+      }
     } finally {
       setLoad(false);
-      console.log("Code execution completed");
     }
   };
 
   const handleShare = () => {
-    console.log("Sharing code");
-    // Implement code sharing logic here
+    const code = editorRef.current.getValue();
+    const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Code URL copied to clipboard!");
+    });
   };
 
   const handleSave = () => {
     console.log("Saving code");
     if (editorRef.current) {
-      // const code = editorRef.current.getValue();
-      console.log(
-        "Code:",
-        editorRef.current.getModel().getLanguageId().language
-      );
-      // const language = editorRef.current.getModel().getLanguageId().language;
-      // const extension = language === "javascript" ? "js" : language;
-      // const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
-      // saveAs(blob, `code.${extension}`);
+      const code = editorRef.current.getValue();
+      const language = editorRef.current.getModel().getLanguageId();
+      const extension = LANGUAGE_EXTENSIONS[language];
+      const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, `Main.${extension}`);
     }
   };
   const handleFormat = () => {
@@ -96,7 +99,11 @@ const CodeEditor = ({
             onClick={() => handleRun(input)}
             disabled={load}
           >
-            <Play className="h-4 w-4" />
+            {load ? (
+              <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full border-green-500"></div>
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
           </Button>
           <Button variant="outline" size="icon" onClick={handleShare}>
             <Share className="h-4 w-4" />

@@ -7,6 +7,15 @@ export const LANGUAGE_VERSIONS: Record<string, string> = {
   php: "8.2.3",
 };
 
+export const LANGUAGE_EXTENSIONS: Record<string, string> = {
+  javascript: ".js",
+  typescript: ".ts",
+  python: ".py",
+  java: ".java",
+  csharp: ".cs",
+  php: ".php",
+};
+
 export const CODE_SNIPPETS: Record<string, string> = {
   javascript: `function greet() {
   console.log("Hello, World!");
