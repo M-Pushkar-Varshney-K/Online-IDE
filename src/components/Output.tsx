@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FC, useState, useEffect } from "react";
+import { Label } from "@/components/ui/label";
 
 interface OutputProps {
   output: Array<string> | null;
@@ -18,9 +19,11 @@ const Output: FC<OutputProps> = ({ output, loading, error }) => {
   }, [loading]);
 
   return (
-    <Card className="w-full mx-auto p-4 h-full grid grid-rows-6 min-h-4">
-      <h2 className="text-2xl font-bold pb-4">Output</h2>
-      <div className="overflow-y-auto bg-black text-white p-2 rounded font-mono">
+    <Card className="flex flex-col justify-evenly w-full h-full px-4 py-2">
+      <Label className="text-2xl font-bold overflow-hidden min-h-[40px]">
+        Output
+      </Label>
+      <div className="w-full h-5/6 bg-black text-white p-2 rounded font-mono">
         {initialMessage ? (
           <p className="text-gray-500">Click run to check your output</p>
         ) : loading ? (

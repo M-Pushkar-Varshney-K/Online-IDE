@@ -5,21 +5,3 @@
   padding: 0;
   box-sizing: border-box;
 }
-
-.SplitPane {
-  height: 100%;
-}
-
-.Pane {
-  overflow: auto;
-}
-
-.resize-vertical {
-  display: flex;
-  flex-direction: column;
-}
-
-.resize-horizontal {
-  display: flex;
-  flex-direction: row;
-}

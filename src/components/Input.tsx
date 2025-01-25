@@ -1,4 +1,6 @@
 import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 import { Dispatch, SetStateAction } from "react";
 
@@ -8,15 +10,19 @@ interface InputProps {
 
 const Input = ({ setInput }: InputProps) => {
   return (
-    <Card className="w-full mx-auto p-4 grid grid-rows-6 h-full">
-      <h2 className="text-2xl font-bold row-span-1">Input</h2>
-      <div className="flex justify-between items-center row-span-5 border border-foreground rounded">
-        <textarea
-          className="w-full h-full bg-transparent text-foreground p-2 resize-none"
-          placeholder="Type Your Input here"
-          onChange={(e) => setInput(e.target.value)}
-        />
-      </div>
+    <Card className="flex flex-col justify-evenly w-full h-full px-4 py-2">
+      <Label
+        htmlFor="input"
+        className="text-2xl font-bold overflow-hidden min-h-[40px]"
+      >
+        Input
+      </Label>
+      <Textarea
+        id="input"
+        placeholder="Type Your Input here"
+        onChange={(e) => setInput(e.target.value)}
+        className="w-full h-5/6 p-2 rounded "
+      />
     </Card>
   );
 };
