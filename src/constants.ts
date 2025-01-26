@@ -8,14 +8,30 @@ export const LANGUAGE_VERSIONS: Record<string, string> = {
 };
 
 export const LANGUAGE_EXTENSIONS: Record<string, string> = {
-  javascript: ".js",
-  typescript: ".ts",
-  python: ".py",
-  java: ".java",
-  csharp: ".cs",
-  php: ".php",
+  javascript: "js",
+  typescript: "ts",
+  python: "py",
+  java: "java",
+  csharp: "cs",
+  php: "php",
 };
 
+export const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {
+  javascript: "JavaScript",
+  typescript: "TypeScript",
+  python: "Python",
+  java: "Java",
+  csharp: "C#",
+  php: "PHP",
+};
+export const EXTENSIONS_TO_LANGUAGES: Record<string, string> = {
+  js: "javascript",
+  ts: "typescript",
+  py: "python",
+  java: "java",
+  cs: "csharp",
+  php: "php",
+};
 export const CODE_SNIPPETS: Record<string, string> = {
   javascript: `function greet() {
   console.log("Hello, World!");

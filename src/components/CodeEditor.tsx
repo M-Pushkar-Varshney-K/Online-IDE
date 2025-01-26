@@ -4,7 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Play, Share, Save, Braces, Plus } from "lucide-react";
 import { executeCode } from "@/api";
-import { CODE_SNIPPETS, LANGUAGE_EXTENSIONS } from "@/constants";
+import {
+  CODE_SNIPPETS,
+  EXTENSIONS_TO_LANGUAGES,
+  LANGUAGE_EXTENSIONS,
+} from "@/constants";
 import { saveAs } from "file-saver";
 import {
   Tooltip,
@@ -20,6 +24,8 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface CodeEditorProps {
   language: string;
@@ -38,10 +44,41 @@ const CodeEditor = ({
   setLoading,
   setError,
 }: CodeEditorProps) => {
+  const { toast } = useToast();
   const [theme, setTheme] = useState("dark");
   const editorRef = useRef<any>(null);
   const [value, setValue] = useState(Value);
   const [load, setLoad] = useState(false);
+  const [fileName, setFileName] = useState("Main");
+
+  const [files, setFiles] = useState<
+    Array<{ name: string; extension: string }>
+  >([{ name: "Main", extension: LANGUAGE_EXTENSIONS[language] }]);
+
+  const handleFile = (file: string) => {
+    const [name, extension] = file.split(".");
+    if (files.some((f) => f.name === name && f.extension === extension)) {
+      toast({
+        variant: "destructive",
+        title: "File name already exists!",
+        description: "Use a different name or extension",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+      return;
+    }
+    if (!extension) {
+      toast({
+        variant: "destructive",
+        title: "Extenstion missing!",
+        description: "Please provide a file extension!",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+      return;
+    }
+    console.log("Creating file", name, extension);
+    setFiles((prevFiles) => [...prevFiles, { name, extension }]);
+  };
+
   setLoading(load);
   const onMount = (editor: any) => {
     editorRef.current = editor;
@@ -93,16 +130,17 @@ const CodeEditor = ({
   };
   return (
     <Card className="w-full p-4 space-y-4">
-      <Tabs defaultValue="main" className="flex flex-col">
+      <Tabs defaultValue={files[0].name} className="flex flex-col">
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
             <TabsList className="flex space-x-2 ">
-              <TabsTrigger value="main">
-                Main{LANGUAGE_EXTENSIONS[language]}
-              </TabsTrigger>
-              <TabsTrigger value="main2">
-                Main2{LANGUAGE_EXTENSIONS[language]}
-              </TabsTrigger>
+              {files.map((file) => (
+                <TabsTrigger value={file.name} key={file.name}>
+                  {file.name}
+                  {"."}
+                  {file.extension}
+                </TabsTrigger>
+              ))}
             </TabsList>
             <TooltipProvider>
               <Tooltip>
@@ -118,8 +156,15 @@ const CodeEditor = ({
                       <Input
                         id="input"
                         placeholder="Type Your file name with extension here"
+                        value={fileName}
+                        onChange={(e) => setFileName(e.target.value)}
                       />
-                      <Button type="submit">Submit</Button>
+                      <Button
+                        type="submit"
+                        onClick={() => handleFile(fileName)}
+                      >
+                        Submit
+                      </Button>
                     </PopoverContent>
                   </Popover>
                 </TooltipTrigger>
@@ -131,6 +176,7 @@ const CodeEditor = ({
           </div>
 
           <div className="flex space-x-2">
+            {/* Toggle theme */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -149,10 +195,11 @@ const CodeEditor = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Change the Mode</p>
+                  <p>Toggle Theme</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {/* Run The Code */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -174,6 +221,7 @@ const CodeEditor = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {/* Share the code */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -186,6 +234,7 @@ const CodeEditor = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {/* Save the code */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -198,6 +247,7 @@ const CodeEditor = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {/* Format the code */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -212,38 +262,26 @@ const CodeEditor = ({
             </TooltipProvider>
           </div>
         </div>
-        <TabsContent value="main">
-          <Editor
-            height="75vh"
-            width={"100%"}
-            theme={theme === "dark" ? "vs-dark" : "light"}
-            language={language}
-            onMount={onMount}
-            value={CODE_SNIPPETS[language] || value}
-            onChange={(value) => setValue(value || "")}
-            options={{
-              fontFamily: "Consolas, 'Courier New', monospace",
-              fontSize: 16,
-              tabSize: 4,
-            }}
-          />
-        </TabsContent>
-        <TabsContent value="main2">
-          <Editor
-            height="75vh"
-            width={"100%"}
-            theme={theme === "dark" ? "vs-dark" : "light"}
-            language={language}
-            onMount={onMount}
-            value={CODE_SNIPPETS[language] || value}
-            onChange={(value) => setValue(value || "")}
-            options={{
-              fontFamily: "Consolas, 'Courier New', monospace",
-              fontSize: 16,
-              tabSize: 4,
-            }}
-          />
-        </TabsContent>
+        {files.map((file) => (
+          <TabsContent value={file.name} key={file.name}>
+            <Editor
+              height="75vh"
+              width={"100%"}
+              theme={theme === "dark" ? "vs-dark" : "light"}
+              language={EXTENSIONS_TO_LANGUAGES[file.extension]}
+              onMount={onMount}
+              value={
+                CODE_SNIPPETS[EXTENSIONS_TO_LANGUAGES[file.extension]] || value
+              }
+              onChange={(value) => setValue(value || "")}
+              options={{
+                fontFamily: "Consolas, 'Courier New', monospace",
+                fontSize: 16,
+                tabSize: 4,
+              }}
+            />
+          </TabsContent>
+        ))}
       </Tabs>
     </Card>
   );

@@ -23,7 +23,7 @@ const Output: FC<OutputProps> = ({ output, loading, error }) => {
       <Label className="text-2xl font-bold overflow-hidden min-h-[40px]">
         Output
       </Label>
-      <div className="w-full h-5/6 bg-black text-white p-2 rounded font-mono">
+      <div className="w-full h-5/6 bg-black text-white p-2 rounded font-mono overflow-y-scroll">
         {initialMessage ? (
           <p className="text-gray-500">Click run to check your output</p>
         ) : loading ? (

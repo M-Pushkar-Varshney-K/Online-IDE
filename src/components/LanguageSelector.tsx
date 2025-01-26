@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LANGUAGE_VERSIONS } from "@/constants";
+import { LANGUAGE_DISPLAY_NAMES, LANGUAGE_VERSIONS } from "@/constants";
 import {
   Tooltip,
   TooltipContent,
@@ -34,7 +34,7 @@ const LanguageSelector = ({
               <SelectContent>
                 {languages.map(([language, version]) => (
                   <SelectItem key={language} value={language}>
-                    {language} &nbsp;{" "}
+                    {LANGUAGE_DISPLAY_NAMES[language]} &nbsp;{" "}
                     <span className="text-xs text-gray-500">{version}</span>
                   </SelectItem>
                 ))}
