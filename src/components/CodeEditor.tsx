@@ -1,8 +1,5 @@
+import React, { useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
-import { useRef, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun, Play, Share, Save, Braces, Plus } from "lucide-react";
 import { executeCode } from "@/api";
 import {
   CODE_SNIPPETS,
@@ -10,22 +7,12 @@ import {
   LANGUAGE_EXTENSIONS,
 } from "@/constants";
 import { saveAs } from "file-saver";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import Actions from "@/components/Actions"; // Adjust path as needed
+import FileActions from "@/components/FileActions";
 
 interface CodeEditorProps {
   language: string;
@@ -36,20 +23,20 @@ interface CodeEditorProps {
   input: string;
 }
 
-const CodeEditor = ({
+const CodeEditor: React.FC<CodeEditorProps> = ({
   language,
   Value,
   setOutput,
   input,
   setLoading,
   setError,
-}: CodeEditorProps) => {
+}) => {
   const { toast } = useToast();
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState<string>("dark");
   const editorRef = useRef<any>(null);
-  const [value, setValue] = useState(Value);
-  const [load, setLoad] = useState(false);
-  const [fileName, setFileName] = useState("Main");
+  const [value, setValue] = useState<string>(Value);
+  const [load, setLoad] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("Main");
 
   const [files, setFiles] = useState<
     Array<{ name: string; extension: string }>
@@ -69,23 +56,30 @@ const CodeEditor = ({
     if (!extension) {
       toast({
         variant: "destructive",
-        title: "Extenstion missing!",
+        title: "Extension missing!",
         description: "Please provide a file extension!",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
       return;
     }
-    console.log("Creating file", name, extension);
+    toast({
+      variant: "default",
+      title: "File created successfully!",
+      description: `File ${name}.${extension} created successfully`,
+    });
     setFiles((prevFiles) => [...prevFiles, { name, extension }]);
   };
 
   setLoading(load);
+
   const onMount = (editor: any) => {
     editorRef.current = editor;
     editor.focus();
   };
 
   const handleRun = async (input: string) => {
+    if (!editorRef.current) return;
+    const language = editorRef.current.getModel().getLanguageId();
     const sourceCode = editorRef.current.getValue();
     if (!sourceCode) return;
     try {
@@ -110,157 +104,54 @@ const CodeEditor = ({
     const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     navigator.clipboard.writeText(url).then(() => {
-      alert("Code URL copied to clipboard!");
+      toast({
+        title: "Code URL copied to clipboard!",
+        description: "Share the URL with your friends",
+        action: <ToastAction altText="Got it">Got it</ToastAction>,
+      });
     });
   };
 
   const handleSave = () => {
-    console.log("Saving code");
     if (editorRef.current) {
       const code = editorRef.current.getValue();
       const language = editorRef.current.getModel().getLanguageId();
       const extension = LANGUAGE_EXTENSIONS[language];
       const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
       saveAs(blob, `Main.${extension}`);
+      toast({
+        title: "Code saved successfully!",
+        description: `File Main.${extension} saved successfully`,
+      });
     }
   };
+
   const handleFormat = () => {
     if (!editorRef.current) return;
     editorRef.current.getAction("editor.action.formatDocument").run();
   };
+
   return (
     <Card className="w-full p-4 space-y-4">
       <Tabs defaultValue={files[0].name} className="flex flex-col">
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
-            <TabsList className="flex space-x-2 ">
-              {files.map((file) => (
-                <TabsTrigger value={file.name} key={file.name}>
-                  {file.name}
-                  {"."}
-                  {file.extension}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Popover>
-                    <PopoverTrigger>
-                      <Button variant="outline" size="icon">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="flex flex-col space-y-4 p-4">
-                      <Label htmlFor="input">File Name</Label>
-                      <Input
-                        id="input"
-                        placeholder="Type Your file name with extension here"
-                        value={fileName}
-                        onChange={(e) => setFileName(e.target.value)}
-                      />
-                      <Button
-                        type="submit"
-                        onClick={() => handleFile(fileName)}
-                      >
-                        Submit
-                      </Button>
-                    </PopoverContent>
-                  </Popover>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Create a file</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+        <div className="flex justify-between items-center" id="FileActions">
+          <FileActions
+            handleFile={handleFile}
+            fileName={fileName}
+            setFileName={setFileName}
+            files={files}
+          />
 
-          <div className="flex space-x-2">
-            {/* Toggle theme */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      setTheme(theme === "dark" ? "light" : "dark")
-                    }
-                  >
-                    {theme === "dark" ? (
-                      <Sun className="h-4 w-4" />
-                    ) : (
-                      <Moon className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle Theme</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {/* Run The Code */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleRun(input)}
-                    disabled={load}
-                  >
-                    {load ? (
-                      <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full border-green-500"></div>
-                    ) : (
-                      <Play className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Click to Run</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {/* Share the code */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button variant="outline" size="icon" onClick={handleShare}>
-                    <Share className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Share</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {/* Save the code */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button variant="outline" size="icon" onClick={handleSave}>
-                    <Save className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Download</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {/* Format the code */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button variant="outline" size="icon" onClick={handleFormat}>
-                    <Braces className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Format</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <Actions
+            theme={theme}
+            setTheme={setTheme}
+            handleRun={handleRun}
+            handleShare={handleShare}
+            handleSave={handleSave}
+            handleFormat={handleFormat}
+            load={load}
+            input={input}
+          />
         </div>
         {files.map((file) => (
           <TabsContent value={file.name} key={file.name}>
