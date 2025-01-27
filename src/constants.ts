@@ -5,6 +5,7 @@ export const LANGUAGE_VERSIONS: Record<string, string> = {
   java: "15.0.2",
   csharp: "6.12.0",
   php: "8.2.3",
+  cpp: "11.1.0",
 };
 
 export const LANGUAGE_EXTENSIONS: Record<string, string> = {
@@ -14,6 +15,7 @@ export const LANGUAGE_EXTENSIONS: Record<string, string> = {
   java: "java",
   csharp: "cs",
   php: "php",
+  cpp: "cpp",
 };
 
 export const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {

@@ -15,8 +15,6 @@ import Actions from "@/components/Actions"; // Adjust path as needed
 import FileActions from "@/components/FileActions";
 
 interface CodeEditorProps {
-  language: string;
-  Value: string;
   setOutput: (output: Array<string>) => void;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,8 +22,6 @@ interface CodeEditorProps {
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
-  language,
-  Value,
   setOutput,
   input,
   setLoading,
@@ -34,13 +30,23 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const { toast } = useToast();
   const [theme, setTheme] = useState<string>("dark");
   const editorRef = useRef<any>(null);
-  const [value, setValue] = useState<string>(Value);
   const [load, setLoad] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>("Main");
 
   const [files, setFiles] = useState<
-    Array<{ name: string; extension: string }>
-  >([{ name: "Main", extension: LANGUAGE_EXTENSIONS[language] }]);
+    Array<{ name: string; extension: string; code: string }>
+  >([
+    {
+      name: "Main",
+      extension: LANGUAGE_EXTENSIONS["javascript"],
+      code: CODE_SNIPPETS["javascript"],
+    },
+  ]);
+
+  const [currentFile, setCurrentFile] = useState<[string, string]>([
+    files[0].name,
+    files[0].extension,
+  ]);
 
   const handleFile = (file: string) => {
     const [name, extension] = file.split(".");
@@ -67,7 +73,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       title: "File created successfully!",
       description: `File ${name}.${extension} created successfully`,
     });
-    setFiles((prevFiles) => [...prevFiles, { name, extension }]);
+    setFiles((prevFiles) => [
+      ...prevFiles,
+      {
+        name,
+        extension,
+        code: CODE_SNIPPETS[EXTENSIONS_TO_LANGUAGES[extension]],
+      },
+    ]);
   };
 
   setLoading(load);
@@ -77,15 +90,21 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     editor.focus();
   };
 
-  const handleRun = async (input: string) => {
+  const handleRun = async (input: string, fileName: string) => {
     if (!editorRef.current) return;
     const language = editorRef.current.getModel().getLanguageId();
     const sourceCode = editorRef.current.getValue();
     if (!sourceCode) return;
     try {
       setLoad(true);
-      const { run: result } = await executeCode(input, language, sourceCode);
+      const { run: result } = await executeCode(
+        fileName,
+        input,
+        language,
+        sourceCode
+      );
       setOutput(result.output.split("\n"));
+      console.log(result);
       result.stderr ? setError(true) : setError(false);
     } catch (error) {
       console.error("Error:", error);
@@ -118,7 +137,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       const language = editorRef.current.getModel().getLanguageId();
       const extension = LANGUAGE_EXTENSIONS[language];
       const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
-      saveAs(blob, `Main.${extension}`);
+      saveAs(blob, `${currentFile[0]}.${extension}`);
       toast({
         title: "Code saved successfully!",
         description: `File Main.${extension} saved successfully`,
@@ -140,6 +159,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             fileName={fileName}
             setFileName={setFileName}
             files={files}
+            setCurrentFile={setCurrentFile}
           />
 
           <Actions
@@ -151,6 +171,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             handleFormat={handleFormat}
             load={load}
             input={input}
+            filename={currentFile[0]}
           />
         </div>
         {files.map((file) => (
@@ -161,10 +182,16 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               theme={theme === "dark" ? "vs-dark" : "light"}
               language={EXTENSIONS_TO_LANGUAGES[file.extension]}
               onMount={onMount}
-              value={
-                CODE_SNIPPETS[EXTENSIONS_TO_LANGUAGES[file.extension]] || value
-              }
-              onChange={(value) => setValue(value || "")}
+              value={file.code}
+              onChange={(value) => {
+                setFiles((prevFiles) =>
+                  prevFiles.map((f) =>
+                    f.name === file.name && f.extension === file.extension
+                      ? { ...f, code: value || "" }
+                      : f
+                  )
+                );
+              }}
               options={{
                 fontFamily: "Consolas, 'Courier New', monospace",
                 fontSize: 16,

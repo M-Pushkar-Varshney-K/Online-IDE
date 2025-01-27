@@ -11,12 +11,13 @@ import { Moon, Sun, Play, Share, Save, Braces } from "lucide-react";
 interface ActionsProps {
   theme: string;
   setTheme: React.Dispatch<React.SetStateAction<string>>;
-  handleRun: (input: string) => void;
+  handleRun: (input: string, filename: string) => void;
   handleShare: () => void;
   handleSave: () => void;
   handleFormat: () => void;
   load: boolean;
   input: string;
+  filename: string;
 }
 
 const Actions: React.FC<ActionsProps> = ({
@@ -28,6 +29,7 @@ const Actions: React.FC<ActionsProps> = ({
   handleFormat,
   load,
   input,
+  filename,
 }) => {
   return (
     <div className="flex space-x-2">
@@ -60,7 +62,7 @@ const Actions: React.FC<ActionsProps> = ({
             <Button
               variant="outline"
               size="icon"
-              onClick={() => handleRun(input)}
+              onClick={() => handleRun(input, filename)}
               disabled={load}
             >
               {load ? (
