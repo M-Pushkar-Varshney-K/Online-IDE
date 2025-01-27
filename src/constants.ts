@@ -5,9 +5,9 @@ export const LANGUAGE_VERSIONS: Record<string, string> = {
   java: "15.0.2",
   csharp: "6.12.0",
   php: "8.2.3",
-  cpp: "11.1.0",
+  cpp: "10.2.0",
+  c: "10.2.0",
 };
-
 export const LANGUAGE_EXTENSIONS: Record<string, string> = {
   javascript: "js",
   typescript: "ts",
@@ -16,6 +16,7 @@ export const LANGUAGE_EXTENSIONS: Record<string, string> = {
   csharp: "cs",
   php: "php",
   cpp: "cpp",
+  c: "c",
 };
 
 export const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {
@@ -25,6 +26,8 @@ export const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {
   java: "Java",
   csharp: "C#",
   php: "PHP",
+  cpp: "C++",
+  c: "C",
 };
 export const EXTENSIONS_TO_LANGUAGES: Record<string, string> = {
   js: "javascript",
@@ -33,6 +36,8 @@ export const EXTENSIONS_TO_LANGUAGES: Record<string, string> = {
   java: "java",
   cs: "csharp",
   php: "php",
+  cpp: "cpp",
+  c: "c",
 };
 export const CODE_SNIPPETS: Record<string, string> = {
   javascript: `function greet() {
@@ -57,7 +62,7 @@ greet()
 `,
   java: `public class Main {
     public static void main(String[] args) {
-        // System.out.println("Hello, World!");
+        System.out.println("Hello, World!");
     }
 }
 `,
@@ -75,6 +80,18 @@ function greet() {
 }
 
 // Call the greet function
-// greet();
+greet();
 `,
+  cpp: `#include <iostream>
+using namespace std;
+int main() {
+    cout << "Hello, World!";
+    return 0;
+}
+`,
+  c: `#include <stdio.h>
+int main() {
+    printf("Hello, World!");
+    return 0;
+}`,
 };

@@ -10,8 +10,7 @@ import { saveAs } from "file-saver";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import Actions from "@/components/Actions"; // Adjust path as needed
+import Actions from "@/components/Actions";
 import FileActions from "@/components/FileActions";
 
 interface CodeEditorProps {
@@ -43,9 +42,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     },
   ]);
 
-  const [currentFile, setCurrentFile] = useState<[string, string]>([
+  const [currentFile, setCurrentFile] = useState<[string, string, string]>([
     files[0].name,
     files[0].extension,
+    files[0].code,
   ]);
 
   const handleFile = (file: string) => {
@@ -92,8 +92,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
   const handleRun = async (input: string, fileName: string) => {
     if (!editorRef.current) return;
-    const language = editorRef.current.getModel().getLanguageId();
-    const sourceCode = editorRef.current.getValue();
+    const language = EXTENSIONS_TO_LANGUAGES[currentFile[1]];
+    const sourceCode = currentFile[2];
+    console.log("Running code..." + language + " code " + sourceCode);
     if (!sourceCode) return;
     try {
       setLoad(true);
@@ -152,7 +153,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
   return (
     <Card className="w-full p-4 space-y-4">
-      <Tabs defaultValue={files[0].name} className="flex flex-col">
+      <div className="flex flex-col">
         <div className="flex justify-between items-center" id="FileActions">
           <FileActions
             handleFile={handleFile}
@@ -174,33 +175,30 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             filename={currentFile[0]}
           />
         </div>
-        {files.map((file) => (
-          <TabsContent value={file.name} key={file.name}>
-            <Editor
-              height="75vh"
-              width={"100%"}
-              theme={theme === "dark" ? "vs-dark" : "light"}
-              language={EXTENSIONS_TO_LANGUAGES[file.extension]}
-              onMount={onMount}
-              value={file.code}
-              onChange={(value) => {
-                setFiles((prevFiles) =>
-                  prevFiles.map((f) =>
-                    f.name === file.name && f.extension === file.extension
-                      ? { ...f, code: value || "" }
-                      : f
-                  )
-                );
-              }}
-              options={{
-                fontFamily: "Consolas, 'Courier New', monospace",
-                fontSize: 16,
-                tabSize: 4,
-              }}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
+        <Editor
+          height="75vh"
+          width={"100%"}
+          theme={theme === "dark" ? "vs-dark" : "light"}
+          language={EXTENSIONS_TO_LANGUAGES[currentFile[1]]}
+          onMount={onMount}
+          value={currentFile[2]}
+          onChange={(value) => {
+            setFiles((prevFiles) =>
+              prevFiles.map((f) =>
+                f.name === currentFile[0] && f.extension === currentFile[1]
+                  ? { ...f, code: value || "" }
+                  : f
+              )
+            );
+            setCurrentFile([currentFile[0], currentFile[1], value || ""]);
+          }}
+          options={{
+            fontFamily: "Consolas, 'Courier New', monospace",
+            fontSize: 16,
+            tabSize: 4,
+          }}
+        />
+      </div>
     </Card>
   );
 };

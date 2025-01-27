@@ -32,7 +32,7 @@ const Actions: React.FC<ActionsProps> = ({
   filename,
 }) => {
   return (
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 basis-1/3 justify-end ">
       {/* Toggle theme */}
       <TooltipProvider>
         <Tooltip>
