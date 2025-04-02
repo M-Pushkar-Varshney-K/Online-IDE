@@ -51,7 +51,7 @@ const Headers = () => {
           <Tooltip>
             <TooltipTrigger>
               <a
-                href="https://github.com/CoderKumarS/Compiler"
+                href="https://github.com/M-Pushkar-Varshney-K/Online-IDE"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex justify-end items-center p-2 rounded-lg bg-black dark:bg-white "
