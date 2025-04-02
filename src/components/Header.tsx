@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Github } from "lucide-react";
+
 const Headers = () => {
   return (
     <div className="my-4 grid grid-cols-3 gap-2">
@@ -50,16 +51,17 @@ const Headers = () => {
           <Tooltip>
             <TooltipTrigger>
               <a
-                href="https://github.com/CoderKumarS"
+                href="https://github.com/CoderKumarS/Compiler"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex justify-end items-center p-2 rounded-lg bg-black dark:bg-white"
+                className="flex justify-end items-center p-2 rounded-lg bg-black dark:bg-white "
               >
+                {/* Github is deprecated */}
                 <Github className="text-white dark:text-black" />
               </a>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Support Creator</p>
+              <p>Github Repository</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
