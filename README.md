@@ -48,3 +48,17 @@ export default tseslint.config({
   },
 })
 ```
+
+# Screenshots
+
+## Different types of language support
+![Project Screenshot](assets/Screenshot 2025-04-02 103709.png)
+![Project Screenshot](assets/Screenshot 2025-04-02 103658.png)
+
+## Extra Features
+![Project Screenshot](assets/Screenshot 2025-04-02 103731.png)
+
+## All routes that are present in it
+![Project Screenshot](assets/Screenshot 2025-04-02 104028.png)
+
+
